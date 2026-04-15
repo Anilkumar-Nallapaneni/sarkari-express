@@ -1,0 +1,125 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   tokens.css — Design tokens and shared color variables
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Georgia&display=swap');
+
+:root {
+  /* Brand colors */
+  --saffron:       #FF6B1A;
+  --saffron-dark:  #E85A0A;
+  --saffron-light: rgba(255, 107, 26, 0.15);
+  --saffron-pale:  #FFF8F0;
+
+  --navy:          #0A1628;
+  --navy-mid:      #0F2044;
+  --navy-light:    #1a3a5c;
+
+  --emerald:       #00B86B;
+  --emerald-dark:  #00965A;
+  --emerald-light: rgba(0, 184, 107, 0.12);
+
+  --gold:          #F5C842;
+  --gold-dark:     #C9A227;
+  --gold-light:    rgba(245, 200, 66, 0.2);
+
+  /* Neutrals */
+  --bg:            #F2F1ED;
+  --white:         #FFFFFF;
+  --surface:       #FFFFFF;
+  --surface-soft:  rgba(255, 255, 255, 0.06);
+  --surface-muted: rgba(255, 255, 255, 0.12);
+  --muted:         #64748B;
+  --text:          #1a1a2e;
+  --text-light:    #475569;
+  --border:        rgba(10, 22, 40, 0.09);
+  --border-strong: rgba(10, 22, 40, 0.18);
+
+  /* Semantic */
+  --danger:        #DC2626;
+  --danger-light:  #FEF2F2;
+  --danger-border: #FECACA;
+  --success:       #059669;
+  --warning:       #D97706;
+
+  /* Badge neutrals */
+  --badge-new-bg:       rgba(0, 184, 107, 0.15);
+  --badge-new-color:    #00965A;
+  --badge-new-border:   rgba(0, 184, 107, 0.3);
+
+  --badge-hot-bg:       rgba(255, 107, 26, 0.15);
+  --badge-hot-color:    #E55A00;
+  --badge-hot-border:   rgba(255, 107, 26, 0.3);
+
+  --badge-prestige-bg:  rgba(245, 200, 66, 0.20);
+  --badge-prestige-color: #A07800;
+  --badge-prestige-border: rgba(245, 200, 66, 0.4);
+
+  --badge-out-bg:       rgba(37, 99, 235, 0.12);
+  --badge-out-color:    #1D4ED8;
+  --badge-out-border:   rgba(37, 99, 235, 0.25);
+
+  --badge-soon-bg:      rgba(124, 58, 237, 0.12);
+  --badge-soon-color:   #7C3AED;
+  --badge-soon-border:  rgba(124, 58, 237, 0.25);
+
+  --badge-upcoming-bg:  rgba(100, 116, 139, 0.12);
+  --badge-upcoming-color: #475569;
+  --badge-upcoming-border: rgba(100, 116, 139, 0.25);
+
+  /* Typography */
+  --font-body:     'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-serif:    Georgia, 'Times New Roman', serif;
+  --font-mono:     'Courier New', Courier, monospace;
+
+  /* Spacing */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii */
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   18px;
+  --radius-2xl:  24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:   0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md:   0 8px 28px rgba(0, 0, 0, 0.08);
+  --shadow-lg:   0 20px 50px rgba(0, 0, 0, 0.12);
+  --shadow-hero: 0 20px 60px rgba(0, 0, 0, 0.25);
+  --shadow-nav:  0 2px 24px rgba(0, 0, 0, 0.35);
+
+  /* Transitions */
+  --transition-fast:   all 0.15s ease;
+  --transition-base:   all 0.22s ease;
+  --transition-slow:   all 0.35s ease;
+
+  /* Layout */
+  --max-width-content: 1280px;
+  --max-width-narrow:   960px;
+  --max-width-form:     720px;
+  --sidebar-width:      300px;
+  --navbar-height:       64px;
+
+  /* Z-index */
+  --z-base:    1;
+  --z-sticky: 100;
+  --z-nav:    999;
+  --z-popup: 9999;
+
+  /* Gradients */
+  --brand-gradient: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+  --navy-gradient:  linear-gradient(135deg, var(--navy), var(--navy-mid));
+  --emerald-gradient: linear-gradient(135deg, var(--emerald), var(--emerald-dark));
+  --gold-gradient:  linear-gradient(135deg, var(--gold), var(--gold-dark));
+}

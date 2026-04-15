@@ -11,8 +11,6 @@ import Ticker      from "./components/Ticker";
 import Navbar      from "./components/Navbar";
 import Footer      from "./components/Footer";
 import NotifPopup  from "./components/NotifPopup";
-// ✅ App.jsx — proper CSS import (no more JS string)
-import "./styles/global.css";  // ← top of file, before everything else
 
 // Pages
 import HomePage       from "./pages/HomePage";
