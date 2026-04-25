@@ -32,7 +32,7 @@ export default function LoginPage({ onLogin }) {
         {/* HEADER */}
         <div className="login-header">
           <h1>🔐 Welcome Back</h1>
-          <p>Login to SarkariXpress to continue</p>
+          <p>Login to IndiaGovtJobHub to continue</p>
         </div>
 
         {/* FORM */}

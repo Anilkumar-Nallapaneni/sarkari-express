@@ -1,7 +1,22 @@
 import Badge from "../components/shared/Badge";
+import LanguageSelector from "../components/LanguageSelector";
+import { INDIAN_LANGUAGES } from "../data/languageData";
+import { getJobDetailText } from "../data/jobDetailI18n";
 
-export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest }) {
+export default function JobDetailPage({
+  job,
+  saved,
+  onSave,
+  onBack,
+  goToMockTest,
+  selectedLang = "all",
+  onLanguageChange,
+}) {
   if (!job) return null;
+
+  const t = getJobDetailText(selectedLang, job);
+  const activeLanguage =
+    INDIAN_LANGUAGES.find((lang) => lang.code === selectedLang) || INDIAN_LANGUAGES[0];
 
   const statBox = (label, value) => (
     <div className="detail-card__stat" key={label}>
@@ -12,9 +27,17 @@ export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest
 
   return (
     <div className="detail-page">
-      <button onClick={onBack} className="detail-page__back">
-        ← Back to Jobs
-      </button>
+      <div className="detail-page__topbar">
+        <button onClick={onBack} className="detail-page__back">
+          ← {t.back}
+        </button>
+        <div className="detail-page__lang-selector">
+          <div className="detail-page__lang-label">
+            🌐 {t.langNotice}: <strong>{activeLanguage.native}</strong>
+          </div>
+          <LanguageSelector selectedLang={selectedLang} onLanguageChange={onLanguageChange} />
+        </div>
+      </div>
 
       <div className="detail-card">
         <div className="detail-card__header">
@@ -34,7 +57,7 @@ export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest
                 onClick={() => window.open(job.link, "_blank")}
                 className="detail-card__apply-btn"
               >
-                Apply on Official Site ↗
+                {t.officialSite} ↗
               </button>
               <button
                 onClick={goToMockTest}
@@ -98,36 +121,36 @@ export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest
         </div>
 
         <div className="detail-card__stats">
-          {statBox("📋 Total Posts", job.posts.toLocaleString("en-IN"))}
-          {statBox("💰 Salary", job.salary)}
-          {statBox("🎓 Education", job.edu)}
-          {statBox("🗓 Last Date", job.deadline)}
-          {statBox("📅 Exam Date", job.examDate)}
+          {statBox(`📋 ${t.totalPosts}`, job.posts.toLocaleString("en-IN"))}
+          {statBox(`💰 ${t.salary}`, job.salary)}
+          {statBox(`🎓 ${t.education}`, job.edu)}
+          {statBox(`🗓 ${t.lastDateShort}`, job.deadline)}
+          {statBox(`📅 ${t.examDateShort}`, job.examDate)}
         </div>
 
         <div className="detail-card__body">
           <div>
-            <h3 className="detail-card__section-title">📄 About this Recruitment</h3>
-            <p className="detail-card__desc">{job.desc}</p>
+            <h3 className="detail-card__section-title">📄 {t.about}</h3>
+            <p className="detail-card__desc">{t.descText}</p>
 
-            <h3 className="detail-card__section-title">🔢 Age Limit</h3>
+            <h3 className="detail-card__section-title">🔢 {t.ageLimit}</h3>
             <p className="detail-card__desc">
-              Minimum: <strong>{job.ageMin} years</strong> &nbsp;|&nbsp; Maximum:
-              <strong>{job.ageMax} years</strong>
+              {t.min}: <strong>{job.ageMin} {t.years}</strong> &nbsp;|&nbsp; {t.max}:
+              <strong>{job.ageMax} {t.years}</strong>
             </p>
-            <p className="detail-card__desc">Age relaxation applicable for SC/ST/OBC/PwD as per Govt. norms.</p>
+            <p className="detail-card__desc">{t.ageNote}</p>
 
-            <h3 className="detail-card__section-title">💳 Application Fee</h3>
+            <h3 className="detail-card__section-title">💳 {t.appFee}</h3>
             <div className="fee-grid">
               {[
-                ["General", job.appFee.gen],
-                ["SC/ST", job.appFee.sc],
-                ["Female", job.appFee.female],
+                [t.general, job.appFee.gen],
+                [t.scst, job.appFee.sc],
+                [t.female, job.appFee.female],
               ].map(([cat, fee]) => (
                 <div className="fee-box" key={cat}>
                   <div className="fee-box__cat">{cat}</div>
                   <div className={`fee-box__amount ${fee === 0 ? "fee-box__amount--free" : ""}`}>
-                    {fee === 0 ? "FREE" : `₹${fee}`}
+                    {fee === 0 ? t.free : `₹${fee}`}
                   </div>
                 </div>
               ))}
@@ -135,9 +158,9 @@ export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest
           </div>
 
           <div>
-            <h3 className="detail-card__section-title">✅ How to Apply</h3>
+            <h3 className="detail-card__section-title">✅ {t.howToApply}</h3>
             <div className="apply-steps">
-              {job.steps.map((step, i) => (
+              {t.stepList.map((step, i) => (
                 <div className="apply-step" key={i}>
                   <div className="apply-step__num">{i + 1}</div>
                   <span className="apply-step__text">{step}</span>
@@ -146,11 +169,11 @@ export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest
             </div>
 
             <div className="dates-box">
-              <div className="dates-box__heading">⚠️ Important Dates</div>
+              <div className="dates-box__heading">⚠️ {t.dates}</div>
               {[
-                ["Notification Date", job.notifDate],
-                ["Last Date to Apply", job.deadline],
-                ["Exam Date", job.examDate],
+                [t.notifDate, job.notifDate],
+                [t.lastDate, job.deadline],
+                [t.examDate, job.examDate],
               ].map(([label, value]) => (
                 <div className="dates-box__row" key={label}>
                   <span className="dates-box__row-label">{label}</span>
@@ -166,7 +189,7 @@ export default function JobDetailPage({ job, saved, onSave, onBack, goToMockTest
             onClick={() => window.open(job.link, "_blank")}
             className="btn-primary"
           >
-            🌐 Apply on Official Website ↗
+            🌐 {t.officialWebsite} ↗
           </button>
         </div>
       </div>

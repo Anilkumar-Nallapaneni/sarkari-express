@@ -16,7 +16,7 @@ export default function Footer({ setPage }) {
       <div className="footer__inner">
         <div className="footer__grid">
           <div>
-            <div className="footer__logo">Sarkari<span>Xpress</span></div>
+            <div className="footer__logo">IndiaGovtJobHub</div>
             <p className="footer__tagline">
               India's most modern govt job portal. Real-time notifications for all Central & State vacancies across 28 states.
             </p>
@@ -48,7 +48,7 @@ export default function Footer({ setPage }) {
         </div>
 
         <div className="footer__bottom">
-          <span>© 2025 SarkariXpress. Not affiliated with any Govt. agency. All data from official portals.</span>
+          <span>© 2025 IndiaGovtJobHub. Not affiliated with any Govt. agency. All data from official portals.</span>
           <span>🇮🇳 Made in India with ❤️</span>
         </div>
       </div>

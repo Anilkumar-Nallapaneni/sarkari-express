@@ -41,7 +41,7 @@ export default function App() {
   const [savedJobs, setSavedJobs] = useState(INITIAL_SAVED);
 
   /* ── ACTIVE FILTER  (passed from HomePage → JobsPage) ── */
-  const [filter, setFilter] = useState({ q: "", state: "", cat: "" });
+  const [filter, setFilter] = useState({ q: "", state: "", cat: "", lang: "all" });
 
   /* ── Navigate helper (scrolls to top) ── */
   const navigate = useCallback(
@@ -79,7 +79,7 @@ export default function App() {
   /* ── Go to jobs page with all filters reset ── */
   const goToJobs = useCallback(() => {
     setPrevPage(page);
-    setFilter({ q: "", state: "", cat: "" });
+    setFilter((prev) => ({ ...prev, q: "", state: "", cat: "" }));
     setPage("jobs");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [page]);
@@ -95,6 +95,8 @@ export default function App() {
             onSave={onSave}
             onBack={() => navigate(prevPage)}
             goToMockTest={() => navigate("mocktest")}
+            selectedLang={filter.lang || "all"}
+            onLanguageChange={(lang) => applyFilter({ lang })}
           />
         );
       case "mocktest":
@@ -140,6 +142,8 @@ export default function App() {
             onSave={onSave}
             onViewJob={onViewJob}
             setFilter={applyFilter}
+            selectedLang={filter.lang || "all"}
+            onLanguageChange={(lang) => applyFilter({ lang })}
           />
         );
     }

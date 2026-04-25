@@ -1,34 +1,63 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import JobCard from "../components/JobCard";
 import Sidebar from "../components/Sidebar";
 import AdBanner from "../components/shared/AdBanner";
 import SectionHeader from "../components/shared/SectionHeader";
 import Card from "../components/shared/Card";
 import Badge from "../components/shared/Badge";
+import LanguageSelector from "../components/LanguageSelector";
 import { JOBS_DATA, STATES_DATA, CATS_DATA } from "../data/mockData";
+import { getJobLanguageCodes } from "../data/languageData";
 
-export default function HomePage({ setPage, savedJobs, onSave, onViewJob, setFilter }) {
+export default function HomePage({
+  setPage,
+  savedJobs,
+  onSave,
+  onViewJob,
+  setFilter,
+  selectedLang = "all",
+  onLanguageChange,
+}) {
   const [q, setQ]         = useState("");
   const [state, setState] = useState("All States");
+  const lang = selectedLang;
+
+  const languageFilteredJobs = useMemo(() => {
+    if (!lang || lang === "all") return JOBS_DATA;
+    return JOBS_DATA.filter((job) => getJobLanguageCodes(job).includes(lang));
+  }, [lang]);
 
   const handleSearch = () => {
-    setFilter({ q, state: state === "All States" ? "" : state, cat: "", edu: "All" });
+    setFilter({ q, state: state === "All States" ? "" : state, cat: "", edu: "All", lang });
     setPage("jobs");
+  };
+
+  const handleLanguageChange = (languageCode) => {
+    onLanguageChange?.(languageCode);
+    setFilter({ lang: languageCode });
   };
 
   return (
     <div>
+      {/* Top bar with language selector */}
+      <div className="top-bar">
+        <div className="top-bar__inner">
+          <div className="top-bar__tagline">🇮🇳 IndiaGovtJobHub - Your Gateway to Government Jobs</div>
+          <LanguageSelector selectedLang={lang} onLanguageChange={handleLanguageChange} />
+        </div>
+      </div>
+
       <section className="hero">
         <div className="hero__inner">
           <div>
             <div className="hero__live-pill">
               <span className="hero__live-dot" />
-              {JOBS_DATA.length}+ Active Job Notifications Today
+              {languageFilteredJobs.length}+ Active Job Notifications Today
             </div>
 
             <h1 className="hero__title">
               Find Your<br />
-              <span className="hero__title-accent">Sarkari</span> Dream<br />
+              <span className="hero__title-accent">IndiaGovtJobHub</span> Dream<br />
               Job Faster.
             </h1>
 
@@ -72,7 +101,7 @@ export default function HomePage({ setPage, savedJobs, onSave, onViewJob, setFil
               <span className="hero__card-dot" />
               Just Added
             </div>
-            {JOBS_DATA.slice(0, 6).map((j) => (
+            {languageFilteredJobs.slice(0, 6).map((j) => (
               <div
                 key={j.id}
                 className="latest-card__item"
@@ -91,7 +120,7 @@ export default function HomePage({ setPage, savedJobs, onSave, onViewJob, setFil
                 </div>
               </div>
             ))}
-            <button onClick={() => { setFilter({ q: "", state: "", cat: "", edu: "All" }); setPage("jobs"); }} className="btn-primary btn-block">
+            <button onClick={() => { setFilter({ q: "", state: "", cat: "", edu: "All", lang }); setPage("jobs"); }} className="btn-primary btn-block">
               View All Jobs →
             </button>
           </div>
@@ -103,10 +132,10 @@ export default function HomePage({ setPage, savedJobs, onSave, onViewJob, setFil
       <div className="page-layout">
         <div>
           <div className="home__block">
-            <SectionHeader title="Browse by" accent="State" sub="Click any state to see all vacancies" action="All States" onAction={() => { setFilter({ q: "", state: "", cat: "", edu: "All" }); setPage("jobs"); }} />
+            <SectionHeader title="Browse by" accent="State" sub="Click any state to see all vacancies" action="All States" onAction={() => { setFilter({ q: "", state: "", cat: "", edu: "All", lang }); setPage("jobs"); }} />
             <div className="state-grid">
               {STATES_DATA.map((s) => (
-                <Card key={s.name} onClick={() => { setFilter({ state: s.name, q: "", cat: "", edu: "All" }); setPage("jobs"); }} className="state-card">
+                <Card key={s.name} onClick={() => { setFilter({ state: s.name, q: "", cat: "", edu: "All", lang }); setPage("jobs"); }} className="state-card">
                   <div className="state-card__icon state-card__icon--centered">{s.icon}</div>
                   <div className="state-card__name">{s.name}</div>
                   <div className="state-card__count">{s.count} jobs</div>
@@ -116,12 +145,12 @@ export default function HomePage({ setPage, savedJobs, onSave, onViewJob, setFil
           </div>
 
           <div className="home__block">
-            <SectionHeader title="Job" accent="Categories" sub="Browse by job type" action="All Categories" onAction={() => { setFilter({ q: "", state: "", cat: "", edu: "All" }); setPage("jobs"); }} />
+            <SectionHeader title="Job" accent="Categories" sub="Browse by job type" action="All Categories" onAction={() => { setFilter({ q: "", state: "", cat: "", edu: "All", lang }); setPage("jobs"); }} />
             <div className="cat-grid">
               {CATS_DATA.map((c) => {
                 const cls = `cat-card__icon cat-card__icon--${c.code.toLowerCase().replace(/\s+/g, "-")}`;
                 return (
-                  <Card key={c.name} onClick={() => { setFilter({ cat: c.code, q: "", state: "", edu: "All" }); setPage("jobs"); }} className="cat-card">
+                  <Card key={c.name} onClick={() => { setFilter({ cat: c.code, q: "", state: "", edu: "All", lang }); setPage("jobs"); }} className="cat-card">
                     <div className={cls}>{c.icon}</div>
                     <div>
                       <div className="cat-card__name">{c.name}</div>
@@ -135,18 +164,40 @@ export default function HomePage({ setPage, savedJobs, onSave, onViewJob, setFil
 
           <div className="home__ad-block"><AdBanner /></div>
 
-          <SectionHeader title="Latest" accent="Sarkari Jobs" sub={`${JOBS_DATA.length} vacancies found`} action="View All" onAction={() => setPage("jobs")} />
+          <SectionHeader
+            title="Latest"
+            accent="IndiaGovtJobHub Jobs"
+            sub={`${languageFilteredJobs.length} vacancies found`}
+            action="View All"
+            onAction={() => {
+              setFilter({ q: "", state: "", cat: "", edu: "All", lang });
+              setPage("jobs");
+            }}
+          />
           <div className="jobs-stack">
-            {JOBS_DATA.slice(0, 5).map((j) => (
-              <JobCard key={j.id} job={j} saved={savedJobs.includes(j.id)} onSave={onSave} onView={onViewJob} />
+            {languageFilteredJobs.slice(0, 5).map((j) => (
+              <JobCard
+                key={j.id}
+                job={j}
+                saved={savedJobs.includes(j.id)}
+                onSave={onSave}
+                onView={onViewJob}
+                selectedLang={lang}
+              />
             ))}
           </div>
-          <button onClick={() => setPage("jobs")} className="btn-primary btn-block home__load-all-btn">
-            Load All {JOBS_DATA.length} Jobs →
+          <button
+            onClick={() => {
+              setFilter({ q: "", state: "", cat: "", edu: "All", lang });
+              setPage("jobs");
+            }}
+            className="btn-primary btn-block home__load-all-btn"
+          >
+            Load All {languageFilteredJobs.length} Jobs →
           </button>
         </div>
 
-        <Sidebar setPage={setPage} latestJobs={JOBS_DATA} onViewJob={onViewJob} />
+        <Sidebar setPage={setPage} latestJobs={languageFilteredJobs} onViewJob={onViewJob} />
       </div>
     </div>
   );

@@ -4,9 +4,10 @@ import Sidebar from "../components/Sidebar";
 import Pill from "../components/shared/Pill";
 import Pagination from "../components/shared/Pagination";
 import EmptyState from "../components/shared/EmptyState";
-import { JOBS_DATA, CATS_DATA } from "../data/mockData";
+import { JOBS_DATA, CATS_DATA, STATES_DATA } from "../data/mockData";
+import { INDIAN_LANGUAGES, getJobLanguageCodes } from "../data/languageData";
 
-const STATE_OPTIONS = ["All","Central Govt","Uttar Pradesh","Bihar","Rajasthan","Maharashtra","Delhi","Tamil Nadu","Karnataka","Gujarat","Haryana","Uttarakhand","Kerala"];
+const STATE_OPTIONS = ["All", "Central Govt", ...STATES_DATA.map((s) => s.name)];
 const EDU_OPTIONS   = ["All","10th Pass","12th Pass","ITI/Diploma","Graduate","Post Graduate"];
 const PER_PAGE      = 6;
 
@@ -14,6 +15,7 @@ export default function JobsPage({ savedJobs, onSave, onViewJob, setPage: naviga
   const [q,             setQ]           = useState(initialFilter.q     || "");
   const [stateF,        setStateF]      = useState(initialFilter.state || "All");
   const [catF,          setCatF]        = useState(initialFilter.cat   || "All");
+  const [langF,         setLangF]       = useState(initialFilter.lang  || "all");
   const [eduF,          setEduF]        = useState("All");
   const [sortBy,        setSortBy]      = useState("newest");
   const [currentPage,   setCurrentPage] = useState(1);
@@ -21,19 +23,20 @@ export default function JobsPage({ savedJobs, onSave, onViewJob, setPage: naviga
   const filtered = useMemo(() => {
     let r = [...JOBS_DATA];
     if (q)              r = r.filter((j) => j.title.toLowerCase().includes(q.toLowerCase()) || j.org.toLowerCase().includes(q.toLowerCase()) || j.state.toLowerCase().includes(q.toLowerCase()));
+    if (langF !== "all" && langF)   r = r.filter((j) => getJobLanguageCodes(j).includes(langF));
     if (stateF !== "All" && stateF) r = r.filter((j) => j.state === stateF);
     if (catF   !== "All" && catF)   r = r.filter((j) => j.cat   === catF);
     if (eduF   !== "All")           r = r.filter((j) => j.edu.toLowerCase().includes(eduF.toLowerCase().replace(" pass", "")));
     if (sortBy === "posts")    r.sort((a, b) => b.posts - a.posts);
     if (sortBy === "deadline") r.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
     return r;
-  }, [q, stateF, catF, eduF, sortBy]);
+  }, [q, stateF, catF, eduF, langF, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const shown      = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
-  const hasFilter  = q || stateF !== "All" || catF !== "All" || eduF !== "All";
+  const hasFilter  = q || stateF !== "All" || catF !== "All" || eduF !== "All" || langF !== "all";
 
-  const clearFilters = () => { setQ(""); setStateF("All"); setCatF("All"); setEduF("All"); setCurrentPage(1); };
+  const clearFilters = () => { setQ(""); setStateF("All"); setCatF("All"); setEduF("All"); setLangF("all"); setCurrentPage(1); };
   const onPageChange = (n) => { setCurrentPage(n); window.scrollTo({ top: 0, behavior: "smooth" }); };
 
   return (
@@ -54,6 +57,24 @@ export default function JobsPage({ savedJobs, onSave, onViewJob, setPage: naviga
           {hasFilter && (
             <button className="search-bar__clear-btn" onClick={clearFilters}>✕ Clear Filters</button>
           )}
+        </div>
+
+        <div className="filter-row">
+          <div className="filter-row__label">Language</div>
+          <div className="filter-pills">
+            {INDIAN_LANGUAGES.map((lang) => (
+              <Pill
+                key={lang.code}
+                active={langF === lang.code}
+                onClick={() => {
+                  setLangF(lang.code);
+                  setCurrentPage(1);
+                }}
+              >
+                {lang.native}
+              </Pill>
+            ))}
+          </div>
         </div>
 
         <div className="filter-row">
@@ -95,7 +116,14 @@ export default function JobsPage({ savedJobs, onSave, onViewJob, setPage: naviga
             <EmptyState icon="🔍" title="No jobs found" sub="Try adjusting your filters or search term" action="Clear All Filters" onAction={clearFilters} />
           ) : (
             shown.map((j) => (
-              <JobCard key={j.id} job={j} saved={savedJobs.includes(j.id)} onSave={onSave} onView={onViewJob} />
+              <JobCard
+                key={j.id}
+                job={j}
+                saved={savedJobs.includes(j.id)}
+                onSave={onSave}
+                onView={onViewJob}
+                selectedLang={langF}
+              />
             ))
           )}
         </div>

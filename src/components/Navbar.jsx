@@ -16,8 +16,8 @@ export default function Navbar({ page, setPage, goToJobs, savedCount = 0 }) {
   return (
     <nav className="navbar">
       <button className="navbar__brand" onClick={() => setPage("home")}> 
-        <div className="navbar__brand-icon">SX</div>
-        <span className="navbar__brand-name">Sarkari<span className="navbar__brand-accent">Xpress</span></span>
+        <div className="navbar__brand-icon">IG</div>
+        <span className="navbar__brand-name">IndiaGovtJobHub</span>
       </button>
 
       <div className="navbar__links">
