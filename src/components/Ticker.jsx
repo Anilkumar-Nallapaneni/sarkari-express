@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { TICKERS } from "../data/mockData";
+import { deriveTickers } from "../utils/derivedData";
 
-export default function Ticker() {
+export default function Ticker({ jobsData = [] }) {
+  const dynamicTickers = deriveTickers(jobsData);
   const [idx,  setIdx]  = useState(0);
   const [fade, setFade] = useState(true);
 
@@ -9,7 +10,7 @@ export default function Ticker() {
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
-        setIdx((i) => (i + 1) % TICKERS.length);
+        setIdx((i) => (i + 1) % dynamicTickers.length);
         setFade(true);
       }, 300);
     }, 3200);
@@ -21,10 +22,10 @@ export default function Ticker() {
       <span className="ticker__live-badge">LIVE</span>
 
       <span className={`ticker__text ${fade ? "ticker__text--visible" : "ticker__text--hidden"}`}>
-        ▶ {TICKERS[idx]}
+        ▶ {dynamicTickers[idx]}
       </span>
 
-      <span className="ticker__count">{idx + 1} / {TICKERS.length} alerts</span>
+      <span className="ticker__count">{idx + 1} / {dynamicTickers.length} alerts</span>
     </div>
   );
 }

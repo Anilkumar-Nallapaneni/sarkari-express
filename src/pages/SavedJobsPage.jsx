@@ -1,10 +1,9 @@
 import JobCard from "../components/JobCard";
 import SectionHeader from "../components/shared/SectionHeader";
 import EmptyState from "../components/shared/EmptyState";
-import { JOBS_DATA } from "../data/mockData";
 
-export default function SavedJobsPage({ savedJobs, onSave, onViewJob, setPage }) {
-  const jobs = JOBS_DATA.filter((j) => savedJobs.includes(j.id));
+export default function SavedJobsPage({ savedJobs, onSave, onViewJob, setPage, jobsData = [] }) {
+  const jobs = jobsData.filter((j) => savedJobs.includes(j.id));
 
   return (
     <div className="saved-page">

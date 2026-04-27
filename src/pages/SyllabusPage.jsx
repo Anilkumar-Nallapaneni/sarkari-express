@@ -4,16 +4,18 @@ import Badge from "../components/shared/Badge";
 import Pill from "../components/shared/Pill";
 import SectionHeader from "../components/shared/SectionHeader";
 import EmptyState from "../components/shared/EmptyState";
-import { SYLLABUS_DATA } from "../data/mockData";
+import { deriveSyllabus } from "../utils/derivedData";
 
 const ORG_FILTERS = ["All", "SSC", "UPSC", "RRB", "SBI", "IBPS", "UPPRB"];
 
-export default function SyllabusPage() {
+export default function SyllabusPage({ jobsData = [] }) {
   const [open, setOpen] = useState(null);
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
 
-  const filtered = SYLLABUS_DATA.filter((s) => {
+  const dynamicSyllabus = deriveSyllabus(jobsData);
+
+  const filtered = dynamicSyllabus.filter((s) => {
     const matchOrg = filter === "All" || s.org === filter;
     const matchSearch = !search || s.title.toLowerCase().includes(search.toLowerCase());
     return matchOrg && matchSearch;

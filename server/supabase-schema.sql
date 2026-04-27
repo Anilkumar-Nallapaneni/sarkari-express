@@ -133,6 +133,8 @@ INSERT INTO public.job_sources (source_name, source_url, is_active) VALUES
     ('Rojgar Result', 'https://www.rojgarresult.com', true),
     ('FreshersLive', 'https://www.fresherslive.com', true),
     ('IndiaBix', 'https://www.indiabix.com', true)
+    ('Freejobalert', 'https://www.freejobalert.com', true)
+
 ON CONFLICT DO NOTHING;
 
 -- =====================================================

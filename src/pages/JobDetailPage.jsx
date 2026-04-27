@@ -82,14 +82,14 @@ export default function JobDetailPage({
               <h3 className="detail-card__section-title">💳 {t.appFee}</h3>
               <div className="fee-grid">
                 {[
-                  [t.general, job.appFee.gen],
-                  [t.scst, job.appFee.sc],
-                  [t.female, job.appFee.female],
+                  [t.general, job.appFee?.gen ?? "Check Notif"],
+                  [t.scst, job.appFee?.sc ?? "Check Notif"],
+                  [t.female, job.appFee?.female ?? "Check Notif"],
                 ].map(([cat, fee]) => (
                   <div className="fee-box" key={cat}>
                     <div className="fee-box__cat">{cat}</div>
                     <div className={`fee-box__amount ${fee === 0 ? "fee-box__amount--free" : ""}`}>
-                      {fee === 0 ? t.free : `₹${fee}`}
+                      {fee === 0 ? t.free : (typeof fee === "number" ? `₹${fee}` : fee)}
                     </div>
                   </div>
                 ))}

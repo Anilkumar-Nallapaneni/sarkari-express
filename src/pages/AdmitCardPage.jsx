@@ -7,16 +7,18 @@ import Card from "../components/shared/Card";
 import Badge from "../components/shared/Badge";
 import Pill from "../components/shared/Pill";
 import SectionHeader from "../components/shared/SectionHeader";
-import { ADMIT_DATA } from "../data/mockData";
+import { deriveAdmitCards } from "../utils/derivedData";
 import { C } from "../styles/tokens";
 
 const STATUS_FILTERS = ["All", "SOON", "UPCOMING"];
 
-export default function AdmitCardPage() {
+export default function AdmitCardPage({ jobsData = [] }) {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
 
-  const filtered = ADMIT_DATA.filter((a) => {
+  const dynamicAdmitCards = deriveAdmitCards(jobsData);
+
+  const filtered = dynamicAdmitCards.filter((a) => {
     const matchStatus = filter === "All" || a.badge === filter;
     const matchSearch = !search || a.title.toLowerCase().includes(search.toLowerCase()) || a.org.toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;

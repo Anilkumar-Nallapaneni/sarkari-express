@@ -4,15 +4,17 @@ import Badge from "../components/shared/Badge";
 import Pill from "../components/shared/Pill";
 import SectionHeader from "../components/shared/SectionHeader";
 import EmptyState from "../components/shared/EmptyState";
-import { RESULTS_DATA } from "../data/mockData";
+import { deriveResults } from "../utils/derivedData";
 
 const RESULT_TYPES = ["All", "Final Result", "Mains Result", "Prelim Result", "Cut Off", "PET Result", "Medical Result"];
 
-export default function ResultsPage() {
+export default function ResultsPage({ jobsData = [] }) {
   const [filter, setFilter] = useState("All");
   const [search, setSearch] = useState("");
 
-  const filtered = RESULTS_DATA.filter((r) => {
+  const dynamicResults = deriveResults(jobsData);
+
+  const filtered = dynamicResults.filter((r) => {
     const query = search.toLowerCase();
     const matchType = filter === "All" || r.type === filter;
     const matchSearch = !search || r.title.toLowerCase().includes(query) || r.org.toLowerCase().includes(query);
