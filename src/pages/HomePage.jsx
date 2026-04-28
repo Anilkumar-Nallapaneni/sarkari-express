@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import JobCard from "../components/JobCard";
 import Sidebar from "../components/Sidebar";
 import AdBanner from "../components/shared/AdBanner";

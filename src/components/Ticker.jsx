@@ -15,7 +15,7 @@ export default function Ticker({ jobsData = [] }) {
       }, 300);
     }, 3200);
     return () => clearInterval(interval);
-  }, []);
+  }, [dynamicTickers.length]);
 
   return (
     <div className="ticker">

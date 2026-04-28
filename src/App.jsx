@@ -26,7 +26,7 @@ import SavedJobsPage  from "./pages/SavedJobsPage";
 
 // Data
 import { JOBS_DATA }  from "./data/mockData";
-
+import { fetchAllLiveJobs, getSampleJobsByState } from "./utils/jobFetcher";
 // ── Initial saved jobs (IDs 1 and 5 pre-saved for demo) ──
 const INITIAL_SAVED = [1, 5];
 
@@ -46,13 +46,15 @@ export default function App() {
 
   useEffect(() => {
     async function fetchLiveJobs() {
+      let mappedJobs = [];
       try {
-        const { data, error } = await supabase
+        // First try to fetch from Supabase database
+        const { data } = await supabase
           .from('jobs')
           .select('*')
-          .order('fetched_at', { ascending: false });
+          .order('fetched_at', { ascending: false })
+          .limit(100);
         
-        let mappedJobs = [];
         if (data && data.length > 0) {
           mappedJobs = data.map(dbJob => ({
             id: dbJob.id,
@@ -79,87 +81,40 @@ export default function App() {
           }));
         }
 
-        // Fetch Live Jobs directly from RSS to ensure the user sees them immediately 
-        // even if Supabase insert fails due to RLS.
+        // Fetch Live Jobs from RSS feeds via jobFetcher
         try {
-          const rssUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.freejobalert.com/')}`;
-          const response = await fetch(rssUrl);
-          if (response.ok) {
-            const result = await response.json();
-            const STATES = [
-              { name: "Andhra Pradesh", code: "ap" }, { name: "Arunachal Pradesh", code: "ar" }, { name: "Assam", code: "as" }, { name: "Bihar", code: "bihar" }, { name: "Chhattisgarh", code: "cg" }, { name: "Goa", code: "goa" }, { name: "Gujarat", code: "gj" }, { name: "Haryana", code: "hr" }, { name: "Himachal Pradesh", code: "hp" }, { name: "Jharkhand", code: "jh" }, { name: "Karnataka", code: "ka" }, { name: "Kerala", code: "kl" }, { name: "Madhya Pradesh", code: "mp" }, { name: "Maharashtra", code: "mh" }, { name: "Manipur", code: "mn" }, { name: "Meghalaya", code: "ml" }, { name: "Mizoram", code: "mz" }, { name: "Nagaland", code: "nl" }, { name: "Odisha", code: "or" }, { name: "Punjab", code: "pb" }, { name: "Rajasthan", code: "raj" }, { name: "Sikkim", code: "sk" }, { name: "Tamil Nadu", code: "tn" }, { name: "Telangana", code: "ts" }, { name: "Tripura", code: "tr" }, { name: "Uttar Pradesh", code: "up" }, { name: "Uttarakhand", code: "uk" }, { name: "West Bengal", code: "wb" }
-            ];
-            
-            const extractJobMetadata = (title) => {
-              let state = "Central Govt";
-              let statecode = "central";
-              let cat = "Other";
-              
-              const t = title.toLowerCase();
-              
-              for (const s of STATES) {
-                if (t.includes(s.name.toLowerCase())) {
-                  state = s.name;
-                  statecode = s.code;
-                  break;
-                }
-              }
-              if (t.match(/\bup\b/) || t.includes("uppsc") || t.includes("uppbpb")) { state = "Uttar Pradesh"; statecode = "up"; }
-              if (t.includes("rpsc") || t.includes("rsmssb")) { state = "Rajasthan"; statecode = "raj"; }
-              if (t.includes("bpsc")) { state = "Bihar"; statecode = "bihar"; }
-              if (t.includes("mpsc")) { state = "Maharashtra"; statecode = "mh"; }
-              if (t.includes("ukpsc")) { state = "Uttarakhand"; statecode = "uk"; }
-              if (t.includes("tnpsc")) { state = "Tamil Nadu"; statecode = "tn"; }
-              
-              if (t.includes("railway") || t.includes("rrb") || t.includes("rrc")) cat = "Railway";
-              else if (t.includes("bank") || t.includes("ibps") || t.includes("sbi") || t.includes("rbi")) cat = "Banking";
-              else if (t.includes("police") || t.includes("constable") || t.includes("defence") || t.includes("army") || t.includes("navy") || t.includes("air force") || t.includes("cisf") || t.includes("crpf") || t.includes("bsf")) cat = "Police";
-              else if (t.includes("teach") || t.includes("tet") || t.includes("tgt") || t.includes("pgt") || t.includes("professor") || t.includes("school")) cat = "Teaching";
-              else if (t.includes("medical") || t.includes("health") || t.includes("nurse") || t.includes("aiims") || t.includes("doctor")) cat = "Medical";
-              else if (t.includes("engineer") || t.includes("je ") || t.includes("ae ") || t.includes("tech")) cat = "Engineering";
-              else if (t.includes("psc") || t.includes("upsc")) cat = "PSC";
-              else if (t.includes("ssc")) cat = "SSC";
-              
-              return { state, statecode, cat };
-            };
-
-            if (result.status === "ok" && result.items) {
-              const liveRssJobs = result.items.map((item, i) => {
-                const meta = extractJobMetadata(item.title);
-                return {
-                  id: 2000 + i, // High ID to avoid collision with mock data
-                  source: 'FreeJobAlert',
-                  title: item.title,
-                  org: meta.cat === "Police" ? "Defence/Police" : (meta.cat === "Railway" ? "Indian Railways" : "Government Sector"),
-                  dept: "",
-                  state: meta.state,
-                  statecode: meta.statecode,
-                  posts: 1,
-                  edu: "Check Notification",
-                  salary: "As per rules",
-                  deadline: new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0],
-                  notifdate: new Date().toISOString().split('T')[0],
-                  examdate: "To be notified",
-                  cat: meta.cat,
-                  badge: "NEW",
-                  urgent: false,
-                  agemin: 18,
-                  agemax: 35,
-                  desc: item.content || item.description || "",
-                  link: item.link || "#",
-                  emoji: '🆕'
-                };
-              });
-
-              // Merge avoiding exact title duplicates
-              const existingTitles = new Set(mappedJobs.map(j => j.title));
-              const uniqueLiveJobs = liveRssJobs.filter(j => !existingTitles.has(j.title));
-              
-              mappedJobs = [...uniqueLiveJobs, ...mappedJobs];
-            }
+          console.log('🔄 Fetching live jobs from RSS feeds...');
+          const rssJobs = await fetchAllLiveJobs();
+          if (rssJobs && rssJobs.length > 0) {
+            console.log(`✅ Found ${rssJobs.length} jobs from RSS feeds`);
+            const existingTitles = new Set(mappedJobs.map(j => j.title.toLowerCase()));
+            const uniqueRssJobs = rssJobs.filter(j => !existingTitles.has(j.title.toLowerCase()));
+            mappedJobs = [...uniqueRssJobs, ...mappedJobs];
           }
         } catch (rssError) {
           console.error("RSS Fetch Error:", rssError);
+        }
+
+        // Fetch from external API as backup
+        try {
+          console.log('🔄 Fetching from external API...');
+          const response = await fetch('https://sarkari-express.vercel.app/api/jobs');
+          const result = await response.json();
+          
+          if (result.success && result.jobs && result.jobs.length > 0) {
+            console.log(`✅ Found ${result.jobs.length} jobs from external API`);
+            const existingTitles = new Set(mappedJobs.map(j => j.title.toLowerCase()));
+            const uniqueApiJobs = result.jobs.filter(j => !existingTitles.has(j.title.toLowerCase()));
+            mappedJobs = [...uniqueApiJobs, ...mappedJobs];
+          }
+        } catch (apiError) {
+          console.error("API Fetch Error:", apiError);
+        }
+
+        // If no jobs from database or RSS, use sample jobs for all states
+        if (mappedJobs.length === 0) {
+          console.log('📋 Using sample jobs for all Indian states...');
+          mappedJobs = getSampleJobsByState();
         }
 
         if (mappedJobs.length > 0) {
@@ -167,6 +122,8 @@ export default function App() {
         }
       } catch (err) {
         console.error("Error fetching live jobs:", err);
+        // Fallback to sample jobs on error
+        setJobsData(getSampleJobsByState());
       }
     }
     fetchLiveJobs();
@@ -227,6 +184,7 @@ export default function App() {
             onSave={onSave}
             onBack={() => navigate(prevPage)}
             goToMockTest={() => navigate("mocktest")}
+            setPage={navigate}
           />
         );
       case "mocktest":

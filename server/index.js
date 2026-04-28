@@ -253,19 +253,44 @@ async function saveJobsToDatabase(jobs) {
 }
 
 // =====================================================
-// MAIN FETCH FUNCTION
+// JOB FETCHER - Multi-source job fetching
 // =====================================================
 
+const { fetchAllJobs: fetchFromExternalSources } = require('./fetchJobs');
+
+// Main fetch function that combines sample + external jobs
 async function fetchAllJobs() {
   console.log('\n========================================');
   console.log('🔄 Starting Daily Job Fetch -', new Date().toLocaleString());
   console.log('========================================\n');
   try {
-    const allJobs = getSampleJobs();
+    // Get sample jobs (your existing data)
+    const sampleJobs = getSampleJobs();
+    
+    // Try to fetch from external sources if API key is configured
+    let externalJobs = [];
+    if (process.env.JSEARCH_API_KEY || process.env.RAPIDAPI_KEY) {
+      try {
+        externalJobs = await fetchFromExternalSources();
+        console.log(`📡 External sources fetched: ${externalJobs.length} jobs`);
+      } catch (extErr) {
+        console.log(`⚠️  External fetch failed: ${extErr.message}`);
+      }
+    } else {
+      console.log('💡 Tip: Add JSEARCH_API_KEY in .env for live job updates');
+    }
+    
+    // Combine both sources
+    const allJobs = [...sampleJobs, ...externalJobs];
+    
     console.log(`📊 Total jobs fetched: ${allJobs.length}`);
-    allJobs.forEach((job, index) => {
+    allJobs.slice(0, 5).forEach((job, index) => {
       console.log(`  ${index + 1}. ${job.title} (${job.organization})`);
     });
+    if (allJobs.length > 5) {
+      console.log(`  ... and ${allJobs.length - 5} more`);
+    }
+    
     if (allJobs.length > 0) {
       await saveJobsToDatabase(allJobs);
     }

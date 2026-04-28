@@ -1,8 +1,26 @@
 {
+  "buildCommand": "CI=false npm run build",
+  "devCommand": "npm start",
+  "installCommand": "npm install",
+  "framework": "create-react-app",
+  "outputDirectory": "build",
+  "routes": [
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ],
   "crons": [
     {
       "path": "/api/cron",
       "schedule": "0 8 * * *"
     }
-  ]
+  ],
+  "env": {
+    "REACT_APP_SUPABASE_URL": "https://fafxadjwmksjkxbwyhbe.supabase.co",
+    "REACT_APP_SUPABASE_ANON_KEY": "sb_publishable_gu3EOxlrDGJUHs1HQH_1xw_pprr7GH_"
+  }
 }

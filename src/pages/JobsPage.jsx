@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import JobCard from "../components/JobCard";
 import Sidebar from "../components/Sidebar";
-import Pill from "../components/shared/Pill";
 import Pagination from "../components/shared/Pagination";
 import EmptyState from "../components/shared/EmptyState";
 import { CATS_DATA, STATES_DATA } from "../data/mockData";

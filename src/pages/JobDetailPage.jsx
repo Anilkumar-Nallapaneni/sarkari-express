@@ -11,6 +11,7 @@ export default function JobDetailPage({
   goToMockTest,
   selectedLang = "all",
   onLanguageChange,
+  setPage,
 }) {
   if (!job) return null;
 
@@ -211,19 +212,19 @@ export default function JobDetailPage({
             <h4 className="sidebar-card__title">🔔 Similar Jobs</h4>
             <ul className="sidebar-card__list">
               <li>
-                <a href="#" className="sidebar-card__link">
+                <button className="sidebar-card__link" onClick={() => setPage('jobs')}>
                   SSC CHSL 2026
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="sidebar-card__link">
+                <button className="sidebar-card__link" onClick={() => setPage('jobs')}>
                   Railway Group D
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="sidebar-card__link">
+                <button className="sidebar-card__link" onClick={() => setPage('jobs')}>
                   UPSC Civil Services
-                </a>
+                </button>
               </li>
             </ul>
           </div>
